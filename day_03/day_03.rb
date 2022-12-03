@@ -1,3 +1,7 @@
+# Ultra short version:
+# p(File.read(f).split("\n").sum { [*'a'..'z', *'A'..'Z'].index(_1.chars.each_slice(_1.size / 2).reduce(:&)[0]) + 1 })
+# p(File.read(f).lines.map(&:chars).each_slice(3).sum { [*'a'..'z', *'A'..'Z'].index(_1.reduce(:&)[0]) + 1 })
+
 data = File.read("input.txt")
 
 # PART 1
