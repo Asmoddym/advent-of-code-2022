@@ -40,7 +40,7 @@ int *compute_total_calories_per_section(char **parsed_data) {
   int sections = 0;
 
   for (int i = 0; parsed_data[i] != NULL; i++) {
-    if (!strcmp(parsed_data[i], "")) {
+    if (!strcmp(parsed_data[i], "") || parsed_data[i + 1] == NULL) {
       sections++;
 
       total = realloc(total, sizeof(int) * (sections + 1));
