@@ -26,6 +26,8 @@ char **parse_data() {
     add_line_to_array(line, &array);
   }
 
+  free(line);
+
   fclose(file);
 
   return array;
