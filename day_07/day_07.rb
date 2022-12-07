@@ -1,7 +1,12 @@
 @data = File.read("input.txt")
 
+@nodes = []
+
 def new_node(path, previous: nil)
-  { name: path, previous: previous, dirs: [], files: [] }
+  node = { name: path, previous: previous, dirs: [], files: [] }
+  @nodes << node
+
+  node
 end
 
 @tree = new_node('/')
@@ -24,7 +29,7 @@ def populate_current_path(path, content)
     next unless parts.first != 'dir'
 
     if path[:files].select { |file| file[:name] == parts.last }.first.nil?
-      path[:files] << { name: parts.last, size: parts.first }
+      path[:files] << { name: parts.last, size: parts.first.to_i }
     end
   end
 end
@@ -46,19 +51,25 @@ def compute_tree
   end
 end
 
-@total_under_limit = 0
+def calculate_nodes_side(node)
+  node_size = node[:files].sum { |file| file[:size] }
+  node_size += node[:dirs].sum { |dir| calculate_nodes_side(dir) } if node[:dirs].any?
 
-def calculate_total_size(node)
-  node_size = node[:files].sum { |file| file[:size].to_i }
-  node_size += node[:dirs].sum { |dir| calculate_total_size(dir) } if node[:dirs].any?
-
-  @total_under_limit += node_size if node_size <= 100000
-
-  node_size
+  node[:size] = node_size
 end
 
 compute_tree
+calculate_nodes_side(@tree)
 
-calculate_total_size(@tree)
+# Part 1
 
-puts @total_under_limit
+puts @nodes.sum { |node| node[:size] <= 100000 ? node[:size] : 0 }
+
+# Part 2
+
+unused_space = 70000000 - @tree[:size]
+
+puts @nodes
+      .select { |node| unused_space + node[:size] >= 30000000 }
+      .sort { |a, b| a[:size] <=> b[:size] }
+      .first[:size]
