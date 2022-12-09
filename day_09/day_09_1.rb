@@ -3,18 +3,19 @@
 @rope_position = [{ x: 0, y: 0 }, { x: 0, y: 0 }]
 @visited_tail_positions = []
 
-def must_move_tail?()
+def must_move_tail?
   (@rope_position[0][:x] - @rope_position[1][:x]).abs > 1 ||
     (@rope_position[0][:y] - @rope_position[1][:y]).abs > 1
 end
 
 def move_rope_of(x, y)
-  old_head_position = @rope_position[1].dup
+  @rope_position[1][:x] += x
+  @rope_position[1][:y] += y
 
-  @rope_position[1][:x] += y
-  @rope_position[1][:y] += x
-
-  @rope_position[0] = old_head_position if must_move_tail?()
+  if must_move_tail?
+    @rope_position[0][:x] = @rope_position[1][:x] - x
+    @rope_position[0][:y] = @rope_position[1][:y] - y
+  end
 end
 
 def move_rope(direction, count)
