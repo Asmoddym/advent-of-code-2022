@@ -2,6 +2,7 @@ class CPU
   attr_reader :instructions, :registers, :cycle, :snapshots, :take_snapshots
 
   def initialize(take_snapshots: false)
+    # I thought there would be more registers, so I did it that way...
     @registers = [{ name: 'X', value: 1 }]
     @instructions = File.read("input.txt").split("\n")
     @cycle = 0
