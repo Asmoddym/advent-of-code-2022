@@ -29,7 +29,7 @@ class Monkey
 
   def play_round
     current_items.each_with_index do |item, i|
-      worry_level = inspect_item(item, i)
+      worry_level = inspect_item(item)
       result = worry_level % test_division == 0
 
       throw_to_monkey(test_conditions[result.to_s.to_sym], worry_level)
@@ -43,7 +43,7 @@ class Monkey
     $monkeys[monkey_id].current_items << item
   end
 
-  def inspect_item(item, i)
+  def inspect_item(item)
     level = eval(operation.gsub("old", item.to_s))
 
     level /= 3 unless totally_relieved
@@ -71,7 +71,7 @@ end
 
 def part_2
   generate_rules(totally_relieved: true)
-  10000.times do |i|
+  1000.times do |i|
     $monkeys.each do |monkey|
       a = Time.now
       monkey.play_round
@@ -79,8 +79,8 @@ def part_2
     end
   end
 
-  $monkeys.map { |monkey| monkey.inspections }.sort.last(2).reduce(&:*)
+  $monkeys.map { |monkey| monkey.inspections }#.sort.last(2).reduce(&:*)
 end
 
-# puts part_1
-puts part_2
+puts part_1
+# puts part_2

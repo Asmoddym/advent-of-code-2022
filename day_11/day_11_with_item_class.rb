@@ -1,24 +1,92 @@
+require 'prime'
+
 $monkeys = []
 $items = []
 
 class Item
-  attr_accessor :value, :held_by_monkeys
+  attr_accessor :value, :last_division#, :is_even, :result_for_monkey
 
   def initialize(value)
     @value = value
-    @held_by_monkeys = []
+    @last_division = nil
+#    @is_even = value % 2 == 0
+    # @result_for_monkey = []
+
+    # check_for_monkeys
   end
 
-  def inspect
-    str = value.to_s
-    held_by_monkeys.each do |id|
-      str = "((#{$monkeys[id].operation.gsub("old", str)}))"
+  # def check_for_monkeys
+  #   $monkeys.each do |monkey|
+  #     @result_for_monkey[monkey.id] = inspect(monkey.operation, monkey.test_division)
+  #   end
+  # end
+
+  # def inspect
+  #   str = value.to_s
+  #   held_by_monkeys.each do |id|
+  #     str = "((#{$monkeys[id].operation.gsub("old", str)}))"
+  #   end
+
+  #   puts str
+
+  #   eval(str)
+
+  # end
+
+  # def inspect(operation, test_division)
+  #   operation_nb = operation.split(" ").last.to_i
+
+  #   if operation.include?("*")
+  #     return 
+  #   else
+  #   end
+  # end
+
+  # def inspect(operation, test_division)
+  #   operation_is_even = operation.split(" ").last.gsub("old", value.to_s).to_i % 2 == 0
+
+  #   if operation.include?("*")
+  #     # operation is *
+
+  #     # even * even = even
+  #     # even * odd = even
+
+  #     # odd * odd = odd
+
+  #     @is_even = (operation_is_even || is_even)
+  #   else
+  #     # operation is +
+
+  #     # even + even = even
+  #     # odd + odd = even
+  #     # even + odd = odd
+
+  #     @is_even = (operation_is_even && is_even) || (!operation_is_even && !is_even)
+  #   end
+
+  #   eval(operation.gsub("old", value.to_s)) % test_division == 0
+  # end
+
+  attr_accessor :decomposed_per_monkey
+
+  def inspect(monkey)
+    @decomposed_per_monkey ||= []
+
+    decomposed_per_monkey[monkey.id] ||= { times: value / monkey.test_division, rest: value % monkey.test_division }
+    recomposed_value = decomposed_per_monkey[monkey.id][:times] * monkey.test_division + decomposed_per_monkey[monkey.id][:rest]
+
+    puts "original: #{value}, recomposed: #{recomposed_value}"
+
+    $monkeys.each do |monkey|
+      new_value = eval(monkey.operation.gsub("old", recomposed_value.to_s))
+      puts "new value for monkey #{monkey.id}: #{new_value} with div #{monkey.test_division}"
+
+      decomposed_per_monkey[monkey.id] = { times: new_value / monkey.test_division, rest: new_value % monkey.test_division }
     end
 
-    puts str
+    puts decomposed_per_monkey
 
-    eval(str)
-
+    decomposed_per_monkey[monkey.id][:times] * monkey.test_division + decomposed_per_monkey[monkey.id][:rest]
   end
 end
 
@@ -59,17 +127,99 @@ class Monkey
 
   def play_round
     current_items.each_with_index do |item, i|
-      item.held_by_monkeys << id
+      # item.held_by_monkeys << id
       # item.held_by_monkeys[id] ||= 0
       # item.held_by_monkeys[id] += 1
       
       # puts "#{id}: checking item (#{item.value})"
 
-      # item.value = inspect_item(item.value)
-      # result = item.value % test_division == 0
+      # value = inspect_item(item.value)
+      # puts value
 
-      result = item.inspect % test_division == 0
+
+      # dividers are prime numbers
+
+      # puts value
+      # if value.to_s.chars.map(&:to_i).sum % 3 == 0
+      #   # can be divided by 3
+      # elsif value % 2 == 0
+      #   # can be divided by 2
+      # end
+
+
+
+
+      # result = value % test_division == 0
+
+      # item.value = value
+
+      # item.inspect(operation, test_division)
+
+      # puts "For #{item.value}: #{inspect_item(item)} #{item.is_even}"
+
+      # result = !item.is_even
+
+      # value = inspect_item(item.value)
+
+
+      # puts ">> #{result}"
+
+      # if result
+      #   item.value = test_division
+      # end
+
+      # result = item.inspect(operation, test_division)
       # puts ">> #{item.inspect}"
+
+
+      # dividable = item.inspect(operation, test_division)
+
+      # result = !item.is_even && dividable
+
+
+      # operation_is_even = operation.split(" ").last.gsub("old", item.value.to_s).to_i % 2 == 0
+
+      # if operation.include?("*")
+      #   # operation is *
+      #   # even * even = even
+      #   # even * odd = even
+      #   # odd * odd = odd
+  
+      #   is_even = (operation_is_even || is_even)
+      # else
+      #   # operation is +
+      #   # even + even = even
+      #   # odd + odd = even
+      #   # even + odd = odd
+  
+      #   is_even = (operation_is_even && is_even) || (!operation_is_even && !is_even)
+      # end
+
+      # new_value = eval(operation.gsub("old", item.value.to_s))
+      # is_dividable = !is_even && new_value % test_division == 0
+
+
+      # item.value = new_value.to_s[-1] if is_dividable
+
+      # result = is_dividable
+
+      # puts "#{item.value} (#{item.is_even}) (#{inspect_item(item.value)}): #{result}"
+
+      # new_value = item.inspect(self)
+
+      # result = new_value % test_division == 0
+
+      new_value = inspect_item(item)
+
+      result = new_value % test_division == 0
+
+      if result
+        item.value = Prime.prime_division(new_value).last.last + 1
+      else
+        item.value =  new_value
+      end
+
+      # item.last_division = test_division
 
       throw_to_monkey(test_conditions[result.to_s.to_sym], item)
     end
@@ -82,8 +232,8 @@ class Monkey
     $monkeys[monkey_id].current_items << item
   end
 
-  def inspect_item(value)
-    level = eval(operation.gsub("old", value.to_s))
+  def inspect_item(item)
+    level = eval(operation.gsub("old", item.value.to_s))
 
     level /= 3 unless totally_relieved
 
@@ -105,14 +255,15 @@ def part_1
   generate_rules
   20.times { $monkeys.each(&:play_round) }
 
-  puts $monkeys.map { |m| m.id.to_s + ": " + m.current_items.map(&:inspect).join(', ') }.join(' | ')
+  # puts $monkeys.map { |m| m.id.to_s + ": " + m.current_items.map(&:inspect).join(', ') }.join(' | ')
 
   $monkeys.map { |monkey| monkey.inspections }.sort.last(2).reduce(&:*)
 end
 
 def part_2
   generate_rules(totally_relieved: true)
-  10000.times do |i|
+
+  20.times do |i|
     $monkeys.each do |monkey|
       a = Time.now
       monkey.play_round
@@ -120,7 +271,7 @@ def part_2
     end
   end
 
-  $monkeys.map { |monkey| monkey.inspections }.sort#.last(2).reduce(&:*)
+  $monkeys.map { |monkey| monkey.inspections }#.sort#.last(2).reduce(&:*)
 end
 
 # puts part_1
