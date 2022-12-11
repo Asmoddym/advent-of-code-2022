@@ -48,7 +48,7 @@ class Monkey
 
     level /= 3 unless totally_relieved
 
-    level
+    level % $monkeys.map(&:test_division).reduce(&:*)
   end
 end
 
@@ -71,7 +71,7 @@ end
 
 def part_2
   generate_rules(totally_relieved: true)
-  1000.times do |i|
+  10000.times do |i|
     $monkeys.each do |monkey|
       a = Time.now
       monkey.play_round
@@ -79,8 +79,8 @@ def part_2
     end
   end
 
-  $monkeys.map { |monkey| monkey.inspections }#.sort.last(2).reduce(&:*)
+  $monkeys.map { |monkey| monkey.inspections }.sort.last(2).reduce(&:*)
 end
 
-puts part_1
-# puts part_2
+# puts part_1
+puts part_2
