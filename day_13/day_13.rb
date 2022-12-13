@@ -34,8 +34,7 @@ def part_1
   count = 0
 
   File.read("input.txt").split("\n\n").each_with_index do |pair, idx|
-    result = compare_pair(pair.split("\n").map { |list| eval(list) })
-    count += idx + 1 if result
+    count += idx + 1 if compare_pair(pair.split("\n").map { |list| eval(list) })
   end
 
   count
